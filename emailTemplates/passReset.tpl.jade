@@ -1,0 +1,16 @@
+doctype html
+html(lang='en')
+    head
+        title='nodeBook password reset'
+    body(style=bodyStyle)
+        table(style=bodyTableStyle)
+            tr
+                td(style=bodyTableCellStyle)
+                    | Greetings #{name}
+                    p We recieved a request to reset password on your account
+                    p If you didn't wish to reset your password, ignore this email
+                    p In other case click the link below to continue
+            tr
+                td(style=bodyTableCellStyle)
+                    div
+                        a(href=link) Reset password

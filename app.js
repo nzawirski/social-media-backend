@@ -4,7 +4,7 @@ const config = require('./config/config')
 const db = require('./config/db')
 const app = express();
 const http = require('http').createServer(app);
-
+const io = require('socket.io')(http);
 const port = config.port;
 app.use(express.json());
 app.use(cors());
@@ -17,6 +17,19 @@ app.use('/api-doc', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
 
 // db
 db.connect().catch((e)=>console.error('Error connecting to database ' + e))
+
+// sockets
+io.on('connection', function (socket) {
+    console.log(`user connected on socket ${socket.id}`)
+    socket.on('disconnect', function () {
+        console.log(`user disconnected from socket ${socket.id}`);
+    });
+    socket.on('testConnection', function (userId) {
+        console.log(`socket ${socket.id} identified user ${userId}`)
+        io.emit(userId, `You are connected on socket ${socket.id}`);
+    })
+})
+module.exports = io
 
 // api
 app.get('/', (req, res) => {

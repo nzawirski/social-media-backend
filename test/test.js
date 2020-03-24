@@ -489,7 +489,7 @@ describe('Functionality after login: Following, news feed', function () {
             .set('Authorization', 'Bearer ' + user2token)
             .then((res) => {
                 assert.equal(res.status, 200, 
-                    "api/me/follows should return 201")
+                    "api/me/follows should return 200")
                 assert.equal(res.body.followersAmount, 1, 
                     "Should have one follower")
                 assert.equal(res.body.followers[0].first_name, 
@@ -514,7 +514,7 @@ describe('Functionality after login: Following, news feed', function () {
         request(app).get('/api/me/follows')
             .set('Authorization', 'Bearer ' + user2token)
             .then((res) => {
-                assert.equal(res.status, 200, "api/me/follows should return 201")
+                assert.equal(res.status, 200, "api/me/follows should return 200")
                 assert.equal(res.body.followersAmount, 0, "Should have NO followers")
                 done()
             })

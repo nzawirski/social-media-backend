@@ -1,9 +1,9 @@
 ---
 openapi: 3.0.0
 info:
-  version: 0.1.0
+  version: 1.1.0
   title: Social Media Api
-  description: Social media yeah
+  description: beng beng
 servers:
 - url: http://localhost:3001
   description: Local server
@@ -222,9 +222,7 @@ paths:
                     type: string
                   date_of_birth:
                     type: date
-                  country: 
-                    type: string
-                  city:
+                  bio:
                     type: string
 
       responses:
@@ -488,9 +486,7 @@ paths:
                   type: string
                 date_of_birth:
                   type: string
-                country:
-                  type: string
-                city:
+                bio:
                   type: string
       responses:
         '201': 
@@ -966,6 +962,8 @@ components:
           type: string
         email:
           type: string
+        bio:
+          type: string
         create_date:
           type: date
           example: "2019-10-01T18:44:43.886Z"
@@ -983,10 +981,6 @@ components:
           type: boolean
         date_of_birth:
           type: date
-        country: 
-          type: string
-        city:
-          type: string
         isFollowed:
           type: boolean
           
