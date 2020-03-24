@@ -1,0 +1,1181 @@
+---
+openapi: 3.0.0
+info:
+  version: 0.1.0
+  title: Social Media Api
+  description: Social media yeah
+servers:
+- url: http://localhost:3001
+  description: Local server
+
+paths:
+  /api/login:
+    post:
+        tags:
+          - Login
+        summary: Login
+        requestBody:
+          content:
+            application/json:
+              schema:
+                required:
+                  - email
+                  - password
+                properties:
+                  email:
+                    type: string
+                  password:
+                    type: string
+        responses:
+          '200': 
+            description: Logged in succesfully
+            content:
+              application/json:
+                schema: 
+                  type: object
+                  properties: 
+                    token: 
+                      type: string
+                      example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjoic3RyaW5nIiwiaWQiOiI1ZGFiODA1NjI3ZDYyMDE0MTQxMzBhOGQiLCJpYXQiOjE1NzE1NzEwOTd9.dNADXPhAwg7lc8St8SktJ63VsIIBB2vM5k8hzxLzSlE
+          '400': 
+            $ref: '#/components/responses/BadRequestError'
+          '401': 
+            $ref: '#/components/responses/ForbiddenError'
+          '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/activate/{_token}:
+    get:
+        tags:
+          - Activate
+        summary: Activate account
+        parameters:
+        - name: _token
+          in: path
+          description: Activation token
+          required: true
+          schema:
+            type: string
+        responses:
+          '200': 
+            description: Account activated
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/User'
+          '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/reset-password/{_token}:
+    post:
+      tags:
+        - Reset-password
+      summary: Change user password with token
+      parameters:
+        - name: _token
+          in: path
+          description: Activation token
+          required: true
+          schema:
+            type: string
+      requestBody:
+          content:
+            application/json:
+              schema:
+                properties:
+                  password:
+                    type: string
+      responses:
+        '200': 
+          description: A User object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/me/feed:
+    get:
+      tags: 
+        - Me
+      summary: News feed
+      responses:
+        '200': 
+          content:
+              application/json:
+                schema: 
+                  type: array
+                  items:  
+                    $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403': 
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/me/notifications:
+    get:
+      tags: 
+        - Me
+      summary: User notifications
+      responses:
+        '200': 
+          content:
+              application/json:
+                schema: 
+                  type: array
+                  items:  
+                    $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403': 
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/me/notifications/unread:
+    get:
+      tags: 
+        - Me
+      summary: Unread notifications
+      responses:
+        '200': 
+          content:
+              application/json:
+                schema: 
+                  type: object
+                  properties:
+                    unreadAmount: 
+                      type: number
+                    notifications:
+                      type: array
+                      items:  
+                        $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403': 
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/notifications/{_id}:
+    get:
+      tags: 
+        - Notifications
+      summary: Single notification
+      parameters:
+        - name: _id
+          in: path
+          description: Notification ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/Notification'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403': 
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/me:
+    get:
+      tags: 
+        - Me
+      summary: Returns user currently logged in
+      responses:
+        '200': 
+          description: A User object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+    put:
+      tags:
+        - Me
+      summary: Edit currently logged in user
+      requestBody:
+          content:
+            application/json:
+              schema:
+                properties:
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  password:
+                    type: string
+                  date_of_birth:
+                    type: date
+                  country: 
+                    type: string
+                  city:
+                    type: string
+
+      responses:
+        '200': 
+          description: A User object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags:
+        - Me
+      summary: Delete account
+      responses:
+        '200': 
+          description: Account deleted
+
+  /api/me/posts:
+    get:
+      tags: 
+        - Me
+      summary: Returns posts of a currently logged in user
+      responses:
+        '200': 
+          description: Array of Post objects
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:  
+                  $ref: '#/components/schemas/Post'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/me/photos:
+    get:
+      tags: 
+        - Me
+      summary: Returns photos of a currently logged in user
+      responses:
+        '200': 
+          description: Array of Photo objects
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:  
+                  $ref: '#/components/schemas/Photo'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/me/follows:
+    get:
+      tags: 
+        - Me
+      summary: Returns list of users following and being followed by currently logged in user
+      responses:
+        '200': 
+          content:
+              application/json:
+                schema: 
+                  type: object
+                  properties: 
+                    followersAmount: 
+                      type: number
+                    followers:
+                      type: array
+                      items:  
+                        $ref: '#/components/schemas/User'
+                    followingAmount: 
+                      type: number
+                    following:
+                      type: array
+                      items:  
+                        $ref: '#/components/schemas/User'
+        '400': 
+            $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/me/profilePic:
+    put:
+      tags:
+        - Me
+      summary: Change Profile Picture
+      requestBody:
+          content:
+            multipart/form-data:
+              schema:
+                properties:
+                  image:
+                    type: file
+      responses:
+        '200': 
+          description: A User object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags:
+        - Me
+      summary: Delete current Profile Picture
+      responses:
+        '200': 
+          description: Picture deleted or there was no picture in the beginning
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/conversations:
+    get:
+      tags:
+        - Conversations
+      summary: Returns conversations of a currently logged in user
+      responses:
+        '200': 
+          description: Array of Conversation objects
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:  
+                  $ref: '#/components/schemas/Conversation'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+    post:
+      tags:
+        - Conversations
+      summary: Create a new conversation or return id of existing conversation with same participants
+      requestBody:
+          content:
+            application/json:
+              schema:
+                properties:
+                  participants:
+                    type: array
+                    items:
+                      type: string
+                      description: ids of participants (without current user)
+      responses:
+        '200': 
+          description: If exists - Conversation object
+          content:
+            application/json:
+              schema:  
+                $ref: '#/components/schemas/Conversation'
+        '201': 
+          description: If doesn't exist - New conversation object
+          content:
+            application/json:
+              schema:  
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+            
+  /api/conversations/{_id}:
+    get:
+      tags:
+        - Conversations
+      summary: Get a single conversation
+      parameters:
+        - name: _id
+          in: path
+          description: Conversation ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Conversation object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Conversation'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+    post:
+      tags:
+        - Conversations
+      summary: Send a message
+      parameters:
+        - name: _id
+          in: path
+          description: Conversation ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '201': 
+          description: Message object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Message'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/users:
+    post:
+      tags:
+        - Users
+      summary: Register a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+                - password
+                - first_name
+                - last_name
+              properties:
+                first_name:
+                  type: string
+                last_name:
+                  type: string
+                email:
+                  type: string
+                password:
+                  type: string
+                date_of_birth:
+                  type: string
+                country:
+                  type: string
+                city:
+                  type: string
+      responses:
+        '201': 
+          description: User registered
+        '400': 
+          $ref: '#/components/responses/BadRequestError'
+        '409':
+          $ref: '#/components/responses/ConflictError'
+  
+  /api/users/reset:
+    post:
+      tags:
+        - Users
+      summary: Request a password reset
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - email
+              properties:
+                email:
+                  type: string
+      responses:
+        '200': 
+          description: Token sent
+        '404': 
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/users/{_id}:
+    get:
+      tags: 
+        - Users
+      summary: Returns single user
+      parameters:
+        - name: _id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: A User object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/User'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/users/{_id}/posts:
+    get:
+      tags: 
+        - Users
+      summary: Returns posts of a single user
+      parameters:
+        - name: _id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Array of Post objects
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:  
+                  $ref: '#/components/schemas/Post'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/users/{_id}/photos:
+    get:
+      tags: 
+        - Users
+      summary: Returns photos of a single user
+      parameters:
+        - name: _id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Array of Photo objects
+          content:
+            application/json:
+              schema: 
+                type: array
+                items:  
+                  $ref: '#/components/schemas/Photo'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/users/{_id}/follow:
+    post:
+      tags: 
+        - Users
+      summary: Follow or Unfollow a user
+      description: This request will follow the user if it wasn't already followed or unfollow if it was already followed
+      parameters:
+        - name: _id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Unfollwed user
+        '201': 
+          description: Followed user. Returns a Follow object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Follow'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+  
+  /api/users/{_id}/follows:
+    get:
+      tags: 
+        - Users
+      summary: Returns list of users following and being followed by user
+      parameters:
+        - name: _id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          content:
+              application/json:
+                schema: 
+                  type: object
+                  properties: 
+                    followersAmount: 
+                      type: number
+                    followers:
+                      type: array
+                      items:  
+                        $ref: '#/components/schemas/User'
+                    followingAmount: 
+                      type: number
+                    following:
+                      type: array
+                      items:  
+                        $ref: '#/components/schemas/User'
+        '40': 
+            $ref: '#/components/responses/BadRequestError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/users/search:
+    get:
+      tags: 
+        - Users
+      summary: Search Users
+      parameters:
+        - name: search
+          in: query
+          schema:
+            type: string
+          required: true
+      responses:
+        '200': 
+          description: Array of User objects
+          content:
+            application/json:
+              schema: 
+                type: array
+                items: 
+                  $ref: '#/components/schemas/User'
+
+  /api/posts/:
+    post:
+      tags:
+        - Posts
+      summary: Add a post
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+                postImage:
+                  type: file
+          application/json:
+            schema:
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '201': 
+          description: Created Post JSON object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+  
+  /api/posts/{_id}:
+    get:
+      tags: 
+        - Posts
+      summary: Returns single Post
+      parameters:
+        - name: _id
+          in: path
+          description: Post ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: A Post object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+    
+    put:
+      tags: 
+        - Posts
+      summary: Edit a Post
+      parameters:
+        - name: _id
+          in: path
+          description: Post ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '200': 
+          description: A Post object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags: 
+        - Posts
+      summary: Delete a Post
+      parameters:
+        - name: _id
+          in: path
+          description: Post ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Post Removed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/posts/{_id}/comments:
+    post:
+      tags:
+        - Posts
+      summary: Add a comment
+      parameters:
+        - name: _id
+          in: path
+          description: Post ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '201': 
+          description: Updated Post JSON object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/posts/{_id}/like:
+    post:
+      tags:
+        - Posts
+      summary: Like or unlike a post
+      description: This request will like the post if it wasn't already liked or remove the 'like' if it was already liked
+      parameters:
+        - name: _id
+          in: path
+          description: Post ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Updated Post JSON object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/comments/{_id}:
+    get:
+      tags: 
+        - Comments
+      summary: Returns single Comment
+      parameters:
+        - name: _id
+          in: path
+          description: Comment ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: A Comment object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Comment'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+    put:
+      tags: 
+        - Comments
+      summary: Edit a Comment
+      parameters:
+        - name: _id
+          in: path
+          description: Comment ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - content
+              properties:
+                content:
+                  type: string
+      responses:
+        '200': 
+          description: A Comment object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+    delete:
+      tags: 
+        - Comments
+      summary: Delete a Comment
+      parameters:
+        - name: _id
+          in: path
+          description: Comment ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Comment Removed
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
+  /api/comments/{_id}/like:
+    post:
+      tags:
+        - Comments
+      summary: Like or unlike a comment
+      description: This request will like the comment if it wasn't already liked or remove the 'like' if it was already liked
+      parameters:
+        - name: _id
+          in: path
+          description: Comment ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Updated Comment JSON object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Comment'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '403':
+          $ref: '#/components/responses/ForbiddenError'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+            
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        create_date:
+          type: date
+          example: "2019-10-01T18:44:43.886Z"
+        posts:
+          type: array
+          items:
+            $ref: '#/components/schemas/Post'
+        photos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Photo'
+        profilePic:
+          type: string
+        activated:
+          type: boolean
+        date_of_birth:
+          type: date
+        country: 
+          type: string
+        city:
+          type: string
+        isFollowed:
+          type: boolean
+          
+    Password:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        password:
+          type: string
+
+    Token:
+      type: object
+      properties:
+        user:
+          $ref: '#/components/schemas/User'
+        token:
+          type: string
+
+    Post:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
+        author:
+          $ref: '#/components/schemas/User'
+        create_date:
+          type: date
+          example: "2019-10-01T18:44:43.886Z"
+        last_edit_date:
+          type: date
+          example: "2019-10-01T18:44:43.886Z"
+        content:
+          type: string
+        photo:
+          $ref: '#/components/schemas/Photo'
+        edit_history:
+          type: array
+          items:
+            type: object
+            properties:
+              content:
+                type: string
+              time:
+                type: string
+                example: "2019-10-01T18:44:43.886Z"
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        likesAmount:
+          type: number
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/Comment'
+        commentsAmount:
+          type: number
+        followers:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          
+    Comment:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
+        author:
+          $ref: '#/components/schemas/User'
+        create_date:
+          type: date
+          example: "2019-10-01T18:44:43.886Z"
+        last_edit_date:
+          type: date
+          example: "2019-10-01T18:44:43.886Z"
+        content:
+          type: string
+        edit_history:
+          type: array
+          items:
+            type: object
+            properties:
+              content:
+                type: string
+              time:
+                type: string
+                example: "2019-10-01T18:44:43.886Z"
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        likesAmount:
+          type: number
+        parentPost:
+          $ref: '#/components/schemas/Post'
+
+    Photo:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
+        author:
+          $ref: '#/components/schemas/User'
+        create_date:
+          type: date
+          example: "2019-10-01T18:44:43.886Z"
+        url:
+          type: string
+        parentPost:
+          $ref: '#/components/schemas/Post'
+
+    Follow:
+      type: object
+      properties:
+        follower:
+          $ref: '#/components/schemas/User'
+        followee:
+          $ref: '#/components/schemas/User'
+
+    Notification:
+      type: object
+      properties:
+        who:
+          $ref: '#/components/schemas/User'
+        action:
+          type: string
+        when:
+          type: date
+        relevantPost:
+          $ref: '#/components/schemas/Post'
+        read:
+          type: boolean
+        receiver:
+          $ref: '#/components/schemas/User'
+
+    Conversation:
+      type: object
+      properties:
+        participants:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        last_activity:
+          type: date
+        hasSeenLatestMessages:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        read:
+          type: boolean
+
+    Message:
+      type: object
+      properties: 
+        sender:
+          $ref: '#/components/schemas/User'
+        time:
+          type: date
+        content:
+          type: string 
+
+
+  securitySchemes:
+    JWT token:            
+      type: http
+      scheme: bearer
+      bearerFormat: JWT 
+
+  responses:
+    NoContent: #204
+      description: No content
+    BadRequestError: #400
+      description: Bad request format or required parameter is missing
+    ForbiddenError: #401
+      description: User is not allowed to have access to this resource
+    UnauthorizedError: #403
+      description: Access token is missing or invalid
+    NotFoundError: #404
+      description: Item not found   
+    ConflictError: #409
+      description: Resource already exists
+
+security:
+  - JWT token: []
