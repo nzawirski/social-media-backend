@@ -521,3 +521,197 @@ describe('Functionality after login: Following, news feed', function () {
             .catch((err) => done(err))
     })
 })
+
+describe('Functionality after login: Conversations', function () {
+    this.timeout(5000);
+    before((done) => {
+        db.connect()
+            .then(() => done())
+            .catch((err) => done(err))
+    })
+
+    after((done) => {
+        db.disconnect()
+            .then(() => done())
+            .catch((err) => done(err))
+    })
+    let user1 = {
+        first_name: "Nick",
+        last_name: "Demos",
+        email: "nick@email.com",
+        password: "qwe123"
+    }
+    let user1token
+    let user1id
+    let user2 = {
+        first_name: "Enzo",
+        last_name: "Gorlomi",
+        email: "enzo@email.com",
+        password: "asd%PPP199"
+    }
+    let user2token
+    let user2id
+    it('Register and activate 1st user', (done) => {
+        //registering user
+        request(app).post('/api/users')
+            .send(user1)
+            .then((res) => {
+                assert.equal(res.status, 201, "Status code should be 201")
+                user1id = res.body._id
+                //activating user manually
+                User.findById(user1id)
+                    .exec((err, user) => {
+                        assert.exists(user, 'User should exist in database')
+                        user.activated = true
+                        user.save()
+                        done()
+                    });
+            })
+            .catch((err) => done(err))
+    })
+    it('Register and activate 2nd user', (done) => {
+        //registering user
+        request(app).post('/api/users')
+            .send(user2)
+            .then((res) => {
+                assert.equal(res.status, 201, "Status code should be 201")
+                user2id = res.body._id
+                //activating user manually
+                User.findById(user2id)
+                    .exec((err, user) => {
+                        assert.exists(user, 'User should exist in database')
+                        user.activated = true
+                        user.save()
+                        done()
+                    });
+            })
+            .catch((err) => done(err))
+
+    })
+
+    it('Log in as 1st user and save access token', (done) => {
+        //logging in
+        request(app).post('/api/login')
+            .send({
+                email: user1.email,
+                password: user1.password
+            })
+            .then((res) => {
+                assert.equal(res.status, 200, "/api/login should return 200")
+                assert.exists(res.body.token, "Should receive a token")
+                user1token = res.body.token
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('Log in as 2nd user and save access token', (done) => {
+        //logging in
+        request(app).post('/api/login')
+            .send({
+                email: user2.email,
+                password: user2.password
+            })
+            .then((res) => {
+                assert.equal(res.status, 200, "/api/login should return 200")
+                assert.exists(res.body.token, "Should receive a token")
+                user2token = res.body.token
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    let convId
+    it('as 1st user: create conversation with 2nd user', (done) => {
+        request(app).post('/api/conversations/')
+            .set('Authorization', 'Bearer ' + user1token)
+            .send({
+                participants: [user2id]
+            })
+            .then((res) => {
+                convId = res.body._id
+                assert.equal(res.status, 201,
+                    "Creating conv sould return 201")
+                assert.equal(res.body.participants.length, 2,
+                    "Conv participants collection should have 2 users")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('as 2nd user: check conversations', (done) => {
+        request(app).get('/api/conversations/')
+            .set('Authorization', 'Bearer ' + user2token)
+            .then((res) => {
+                assert.equal(res.status, 200,
+                    "Getting convos sould return 200")
+                assert.equal(res.body.length, 1,
+                    "Conv array should have one element")
+                assert.equal(res.body[0]._id, convId,
+                    "Conv id should match created conv id")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('as 2nd user: send empty message, should fail', (done) => {
+        request(app).post('/api/conversations/' + convId)
+            .set('Authorization', 'Bearer ' + user2token)
+            .then((res) => {
+                assert.equal(res.status, 400,
+                    "Sending message should return 400")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('as 2nd user: send message', (done) => {
+        request(app).post('/api/conversations/' + convId)
+            .set('Authorization', 'Bearer ' + user2token)
+            .send({
+                content: "Hello"
+            })
+            .then((res) => {
+                assert.equal(res.status, 201,
+                    "Sending message should return 201")
+                assert.equal(res.body.content, "Hello",
+                    "Message content should be \"Hello\"")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('as 1st user: check conversations', (done) => {
+        request(app).get('/api/conversations/')
+            .set('Authorization', 'Bearer ' + user1token)
+            .then((res) => {
+                assert.equal(res.status, 200,
+                    "Getting convos sould return 200")
+                assert.equal(res.body[0].read, "false",
+                    "Conversation should be marked as unread")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('as 1nd user: read conv', (done) => {
+        request(app).get('/api/conversations/' + convId)
+            .set('Authorization', 'Bearer ' + user1token)
+            .then((res) => {
+                assert.equal(res.status, 200,
+                    "Reading conv should return 200")
+                assert.equal(res.body.messages[0].content, "Hello",
+                    "Message content should be \"Hello\"")
+                assert.equal(res.body.messages[0].sender._id, user2id,
+                    "Message author id should be user2 id")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+    it('as 1st user: check conversations again', (done) => {
+        request(app).get('/api/conversations/')
+            .set('Authorization', 'Bearer ' + user1token)
+            .then((res) => {
+                assert.equal(res.status, 200,
+                    "Getting convos sould return 200")
+                assert.equal(res.body[0].read, "true",
+                    "Conversation should be marked as read")
+                done()
+            })
+            .catch((err) => done(err))
+    })
+
+})
