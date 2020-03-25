@@ -37,7 +37,10 @@ app.get('/', (req, res) => {
 });
 app.use('/api/users', require('./controller/user'))
 app.use('/api/me', require('./controller/me'))
+app.use('/api/activate', require('./controller/activate'))
 app.use('/api/login', require('./controller/login'))
+app.use('/api/posts', require('./controller/post'))
+app.use('/api/comments', require('./controller/comment'))
 
 // start
 http.listen(port, () => {
