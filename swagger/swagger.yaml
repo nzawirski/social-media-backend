@@ -1099,6 +1099,9 @@ components:
     Follow:
       type: object
       properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
         follower:
           $ref: '#/components/schemas/User'
         followee:
@@ -1107,6 +1110,9 @@ components:
     Notification:
       type: object
       properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
         who:
           $ref: '#/components/schemas/User'
         action:
@@ -1123,6 +1129,9 @@ components:
     Conversation:
       type: object
       properties:
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
         participants:
           type: array
           items:
@@ -1143,6 +1152,9 @@ components:
     Message:
       type: object
       properties: 
+        _id:
+          type: string
+          example: 5da0ff5a9d4a231ad0c9996a
         sender:
           $ref: '#/components/schemas/User'
         time:
