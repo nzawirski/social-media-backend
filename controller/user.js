@@ -104,8 +104,11 @@ router.post('/', (req, res) => {
                 tokenObject.save((err) => {
                     if (err) return res.status(500).json({ message: err.message })
                 })
-                //send email
-                // mailer.sendAfterRegister(user, token)
+                //send email (unless we are running tests)
+                if (process.env.NODE_ENV !== 'test') {
+                    mailer.sendAfterRegister(user, token)
+                }
+                
                 res.status(201).json(user);
             })
         })

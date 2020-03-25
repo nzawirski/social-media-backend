@@ -19,4 +19,6 @@ const conversationSchema = mongoose.Schema({
     }
 });
 
+conversationSchema.index({ last_activity: 1 })
+
 module.exports = mongoose.model("Converstaion", conversationSchema);

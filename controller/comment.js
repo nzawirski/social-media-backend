@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken')
 const readToken = require('../utils/read-token')
 
 const User = require('../model/user');
-const Post = require('../model/post');
 const Comment = require('../model/comment');
 const Notification = require('../model/notification')
 

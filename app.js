@@ -35,12 +35,15 @@ module.exports = io
 app.get('/', (req, res) => {
     res.send(`<h1>Hello, Go to <a href='/api-doc'>/api-doc</a> route to see documentation</h1>`);
 });
-app.use('/api/users', require('./controller/user'))
-app.use('/api/me', require('./controller/me'))
-app.use('/api/activate', require('./controller/activate'))
-app.use('/api/login', require('./controller/login'))
-app.use('/api/posts', require('./controller/post'))
-app.use('/api/comments', require('./controller/comment'))
+app.use('/api/users',           require('./controller/user'))
+app.use('/api/me',              require('./controller/me'))
+app.use('/api/activate',        require('./controller/activate'))
+app.use('/api/login',           require('./controller/login'))
+app.use('/api/posts',           require('./controller/post'))
+app.use('/api/comments',        require('./controller/comment'))
+app.use('/api/conversations',   require('./controller/conversation'))
+app.use('/api/notifications',   require('./controller/notification'))
+app.use('/api/reset-password',  require('./controller/resetPass'))
 
 // start
 http.listen(port, () => {
