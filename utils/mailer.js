@@ -10,7 +10,7 @@ function resolveTemplatePath(filename) {
 
 function sendEmail(emailPayload) {
     let transporter = nodemailer.createTransport(config.mail)
-    transporter.sendMail(emailPayload, (err, res) => {
+    transporter.sendMail(emailPayload, (err) => {
         if (err) {
             console.log('Error sending email', err);
         } 

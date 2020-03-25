@@ -363,7 +363,7 @@ router.get('/feed', readToken, (req, res) => {
                 })
                 Post.find({
                     'author': { $in: following }
-                }).sort({ create_date: -1 })
+                }).sort({ last_activity: -1 })
                     .populate({
                         path: "likes",
                         select: "first_name last_name email profilePic",

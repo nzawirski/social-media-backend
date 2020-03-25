@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken')
 
 const readToken = require('../utils/read-token')
 
-const User = require('../model/user');
 const Conversation = require('../model/conversation')
 const Message = require('../model/message')
 

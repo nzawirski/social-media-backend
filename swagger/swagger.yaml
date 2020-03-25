@@ -782,6 +782,29 @@ paths:
         '404': 
             $ref: '#/components/responses/NotFoundError'
 
+  /api/posts/{_id}/follow:
+    post:
+      tags: 
+        - Posts
+      summary: Follow or Unfollow a post
+      description: This request will follow the post if it wasn't already followed or unfollow if it was already followed
+      parameters:
+        - name: _id
+          in: path
+          description: Post ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200': 
+          description: Success, returns a Post object
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/Post'
+        '404': 
+            $ref: '#/components/responses/NotFoundError'
+
   /api/posts/{_id}/comments:
     post:
       tags:

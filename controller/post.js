@@ -121,7 +121,7 @@ router.get('/:_id', (req, res) => {
                 return res.status(500).json({ message: err.message })
             };
             if (!post) {
-                return res.status(404).json({ message:"Post not found"})
+                return res.status(404).json({ message: "Post not found" })
             }
             res.json(post);
         });
@@ -147,7 +147,7 @@ router.put('/:_id', readToken, (req, res) => {
                     return res.status(500).json({ message: err.message })
                 };
                 if (!post) {
-                    return res.status(404).json({ message:"Post not found"})
+                    return res.status(404).json({ message: "Post not found" })
                 }
                 //Verify if post was made by current user
                 if (authData.id == post.author) {
@@ -185,7 +185,7 @@ router.delete('/:_id', readToken, (req, res) => {
                     return res.status(500).json({ message: err.message })
                 };
                 if (!post) {
-                    return res.status(404).json({ message: "Post not found"})
+                    return res.status(404).json({ message: "Post not found" })
                 }
                 //Verify if post was made by current user
                 if (authData.id == post.author) {
@@ -196,7 +196,7 @@ router.delete('/:_id', readToken, (req, res) => {
                     res.json({ message: "Post deleted" })
 
                 } else {
-                    return res.status(401).json({ message: "This post does not belong to this user"})
+                    return res.status(401).json({ message: "This post does not belong to this user" })
                 }
 
             });
@@ -231,7 +231,7 @@ router.post('/:_id/comments', readToken, (req, res) => {
                         return res.status(500).json({ message: err.message })
                     };
                     if (!post) {
-                        return res.status(404).json({ message: "Post not found"})
+                        return res.status(404).json({ message: "Post not found" })
                     }
                     //Create and add comment
                     let comment = new Comment({ content: content, author: user._id, parentPost: post._id });
@@ -239,6 +239,7 @@ router.post('/:_id/comments', readToken, (req, res) => {
                         if (err) return res.status(500).json({ message: err.message })
                         post.comments.push(comment._id)
                         post.commentsAmount = post.comments.length
+                        post.last_activity = Date.now()
                         //add commenter to post followers
                         let alreadyFollowing = false;
                         post.followers.forEach(_user => {
@@ -301,7 +302,7 @@ router.post('/:_id/like', readToken, (req, res) => {
                         return res.status(500).json({ message: err.message })
                     };
                     if (!post) {
-                        return res.status(404).json({ message: "Post not found"})
+                        return res.status(404).json({ message: "Post not found" })
                     }
                     //Check if post was already liked
                     let alreadyLiked = false;
@@ -334,6 +335,51 @@ router.post('/:_id/like', readToken, (req, res) => {
                     }
                     post.likesAmount = post.likes.length
                     //save post
+                    post.save((err) => {
+                        if (err) return res.status(500).json({ message: err.message })
+                        res.status(200).json(post);
+                    })
+                })
+        })
+    })
+})
+
+//Unfollow a post
+router.post('/:_id/follow', readToken, (req, res) => {
+    jwt.verify(req.token, config.secretKey, (err, authData) => {
+        if (err) {
+            return res.status(403).json({
+                message: err.message
+            })
+        }
+        User.findById(authData.id, (err, user) => {
+            if (err) {
+                return res.status(400).json({
+                    message: err.message
+                })
+            }
+            //find post
+            Post.findById(req.params._id)
+                .exec((err, post) => {
+                    if (err) {
+                        return res.status(500).json({ message: err.message })
+                    };
+                    if (!post) {
+                        return res.status(404).json({ message: "Post not found" })
+                    }
+
+                    //check if user follows post
+                    let alreadyFollowing = false;
+                    post.followers.forEach(_user => {
+                        alreadyFollowing = (_user == authData.id) ? true : alreadyFollowing
+                    })
+                    if (!alreadyFollowing) {
+                        //follow
+                        post.followers.push(user._id)
+                    }else{
+                        //unfollow
+                        post.followers = post.followers.filter(e => e != authData.id);
+                    }
                     post.save((err) => {
                         if (err) return res.status(500).json({ message: err.message })
                         res.status(200).json(post);

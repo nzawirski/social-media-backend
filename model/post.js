@@ -13,6 +13,10 @@ const postSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
+    last_activity:{
+        type: Date,
+        default: Date.now
+    },
     content: {
         type: String,
         required: true
@@ -42,7 +46,7 @@ const postSchema = mongoose.Schema({
         type: String
     }]
 });
-
+postSchema.index({ last_activity: 1 })
 postSchema.pre('deleteOne', { document: true, query: false }, async function (next) {
     var post = this;
     //remove comment docs recursively
@@ -60,7 +64,6 @@ postSchema.pre('deleteOne', { document: true, query: false }, async function (ne
             })
         });
     }
-
     next()
 });
 
