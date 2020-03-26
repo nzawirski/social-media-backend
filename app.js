@@ -48,6 +48,8 @@ app.use('/api/reset-password',  require('./controller/resetPass'))
 // start
 http.listen(port, () => {
     console.log(`Server Started on port ${port}`);
+    process.env.NODE_ENV = process.env.NODE_ENV || 'dev'
+    console.log(`Running in ${process.env.NODE_ENV} enviroment`)
 })
 
 module.exports = app

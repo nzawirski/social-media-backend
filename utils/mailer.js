@@ -9,12 +9,17 @@ function resolveTemplatePath(filename) {
 }
 
 function sendEmail(emailPayload) {
-    let transporter = nodemailer.createTransport(config.mail)
-    transporter.sendMail(emailPayload, (err) => {
-        if (err) {
-            console.log('Error sending email', err);
-        } 
-    });
+    if (process.env.NODE_ENV === 'production') {
+        let transporter = nodemailer.createTransport(config.mail)
+        transporter.sendMail(emailPayload, (err) => {
+            if (err) {
+                console.log('Error sending email', err);
+            }
+        });
+    }else{
+        console.log(emailPayload)
+    }
+
 }
 
 function sendAfterRegister(user, token) {
@@ -39,9 +44,9 @@ function sendPasswordReset(user, token) {
         html: htmlOut
     };
     return sendEmail(emailPayload);
-  }
+}
 
-module.exports =  {
+module.exports = {
     sendAfterRegister: sendAfterRegister,
     sendPasswordReset: sendPasswordReset
 };

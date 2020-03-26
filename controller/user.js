@@ -81,7 +81,7 @@ router.post('/', (req, res) => {
             return res.status(500).json({ message: err.message })
         }
         if (user) {
-            return res.status(409).json({ message: "User already exists"})
+            return res.status(409).json({ message: "User already exists" })
         }
         bcrypt.hash(password, saltRounds, (err, hash) => {
             if (err) return res.status(500).json({ message: err.message })
@@ -104,11 +104,10 @@ router.post('/', (req, res) => {
                 tokenObject.save((err) => {
                     if (err) return res.status(500).json({ message: err.message })
                 })
-                //send email (unless we are running tests)
-                if (process.env.NODE_ENV !== 'test') {
-                    mailer.sendAfterRegister(user, token)
-                }
-                
+
+                mailer.sendAfterRegister(user, token)
+
+
                 res.status(201).json(user);
             })
         })
@@ -130,14 +129,14 @@ router.post('/reset/', (req, res) => {
                 return res.status(500).json({ message: err.message })
             };
             if (!user) {
-                return res.status(404).json({ message: "User not found"})
+                return res.status(404).json({ message: "User not found" })
             }
             let token = uidgen.generateSync();
             let tokenObject = new Token({ user: user._id, token })
             tokenObject.save((err) => {
                 if (err) return res.status(500).json({ message: err.message })
                 mailer.sendPasswordReset(user, token)
-                res.status(200).json({ message: "Token sent"});
+                res.status(200).json({ message: "Token sent" });
             })
         })
 })
@@ -170,7 +169,7 @@ router.get('/:_id', readToken, (req, res) => {
                             return res.status(500).json({ message: err.message })
                         };
                         if (!user) {
-                            return res.status(404).json({ message: "User not found"})
+                            return res.status(404).json({ message: "User not found" })
                         }
                         let isFollowed = false
 
@@ -236,7 +235,7 @@ router.get('/:_id/posts', (req, res) => {
                 return res.status(500).json({ message: err.message })
             };
             if (!user) {
-                return res.status(404).json({ message: "User not found"})
+                return res.status(404).json({ message: "User not found" })
             }
             res.json(user.posts);
         });
@@ -251,7 +250,7 @@ router.get('/:_id/photos', (req, res) => {
                 return res.status(500).json({ message: err.message })
             };
             if (!user) {
-                return res.status(404).json({ message: "User not found"})
+                return res.status(404).json({ message: "User not found" })
             }
             res.json(user.photos);
         });
@@ -267,7 +266,7 @@ router.post('/:_id/follow', readToken, (req, res) => {
             })
         }
         if (authData.id == req.params._id) {
-            return res.status(400).json({ message: "You can't follow yourself"})
+            return res.status(400).json({ message: "You can't follow yourself" })
         }
         //find follower
         User.findById(authData.id, (err, follower) => {
@@ -283,7 +282,7 @@ router.post('/:_id/follow', readToken, (req, res) => {
                         return res.status(500).json({ message: err.message })
                     };
                     if (!followee) {
-                        return res.status(404).json({ message: "User not found"})
+                        return res.status(404).json({ message: "User not found" })
                     }
                     Follow.findOne({ follower: follower._id, followee: followee._id }, (err, follow) => {
                         if (err) {
@@ -294,7 +293,7 @@ router.post('/:_id/follow', readToken, (req, res) => {
                             follow.deleteOne((err) => {
                                 if (err) return res.status(500).json({ message: err.message })
                             })
-                            res.status(200).json({ message: "User unfollowed"})
+                            res.status(200).json({ message: "User unfollowed" })
                         } else {
                             //follow
                             let newFollow = new Follow({ follower: follower._id, followee: followee._id })
@@ -337,7 +336,7 @@ router.get('/:_id/follows', (req, res) => {
                 return res.status(500).json({ message: err.message })
             };
             if (!following) {
-                return res.status(404).json({ message: "User not found"})
+                return res.status(404).json({ message: "User not found" })
             }
 
             follows.forEach(follow => {
@@ -351,7 +350,7 @@ router.get('/:_id/follows', (req, res) => {
                         return res.status(500).json({ message: err.message })
                     };
                     if (!following) {
-                        return res.status(404).json({ message: "User not found"})
+                        return res.status(404).json({ message: "User not found" })
                     }
 
                     follows.forEach(follow => {
