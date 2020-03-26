@@ -90,6 +90,11 @@ router.post('/', (req, res) => {
             date_of_birth ? user.date_of_birth = date_of_birth : null
             bio ? user.bio = bio : null
 
+            if(process.env.NODE_ENV === 'dev'){
+                //automatically activate if in dev enviroment
+                user.activated = true
+            }
+
             //save user
             user.save((err, user) => {
                 if (err) return res.status(500).json({ message: err.message })
