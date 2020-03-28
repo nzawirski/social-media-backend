@@ -28,7 +28,10 @@ connect = () => {
             })
         } else {
             mongoose.connect(config.databaseUrl, { useCreateIndex: true, useNewUrlParser: true, useUnifiedTopology: true })
-            mongoose.set('debug', true) // disable for prod
+            if(process.env.NODE_ENV !== 'production'){
+                mongoose.set('debug', true) 
+            }
+            
             var db = mongoose.connection;
             db.on('error', function (err) {
                 return reject(err);
