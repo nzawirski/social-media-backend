@@ -415,7 +415,7 @@ router.get('/notifications', readToken, (req, res) => {
                     return res.status(500).json({ message: err.message })
                 };
 
-                res.json(notifications);
+                res.json(notifications.reverse() );
             })
     })
 })
@@ -436,7 +436,7 @@ router.get('/notifications/unread', readToken, (req, res) => {
                     return res.status(500).json({ message: err.message })
                 };
 
-                res.json({ unreadAmount: notifications.length, notifications });
+                res.json({ unreadAmount: notifications.length, notifications: notifications.reverse()  });
             })
     })
 })

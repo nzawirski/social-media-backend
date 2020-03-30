@@ -22,9 +22,9 @@ router.post('/', (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "User not found" })
         }
-        // if(!user.activated) {
-        //     return res.status(401).send("This account is not activated")
-        // }
+        if(!user.activated && process.env.NODE_ENV === 'production') {
+            return res.status(401).send("This account is not activated")
+        }
         Password.findOne({ user: user._id }, (err, passData) => {
             if (err) {
                 return res.status(500).json({ message: err.message })
