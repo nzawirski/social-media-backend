@@ -361,6 +361,8 @@ router.get('/feed', readToken, (req, res) => {
                 follows.forEach(follow => {
                     following.push(follow.followee)
                 })
+                //include posts by current user
+                following.push(authData.id)
                 Post.find({
                     'author': { $in: following }
                 }).sort({ last_activity: -1 })
