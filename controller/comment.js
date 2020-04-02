@@ -136,20 +136,23 @@ router.post('/:_id/like', readToken, (req, res) => {
                         //Add like
                         comment.likes.push(authData.id)
                         //send notification to comment author
-                        let notification = new Notification()
-                        notification.who = authData.id
-                        notification.action = 'likeComment'
-                        notification.relevantPost = comment.parentPost
-                        notification.receiver = comment.author
-                        notification.save((err) => {
-                            if (err) console.error(err)
-                        })
-                        notification.who = user
-                        let event = {
-                            type: 'notification',
-                            content: notification
+                        if(comment.author != authData.id){
+                            let notification = new Notification()
+                            notification.who = authData.id
+                            notification.action = 'likeComment'
+                            notification.relevantPost = comment.parentPost
+                            notification.receiver = comment.author
+                            notification.save((err) => {
+                                if (err) console.error(err)
+                            })
+                            notification.who = user
+                            let event = {
+                                type: 'notification',
+                                content: notification
+                            }
+                            io.sockets.emit(comment.author, event)
                         }
-                        io.sockets.emit(comment.author, event)
+                        
                     } else {
                         //Unlike
                         comment.likes = comment.likes.filter(e => e != authData.id);

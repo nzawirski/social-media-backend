@@ -312,21 +312,24 @@ router.post('/:_id/like', readToken, (req, res) => {
                     if (!alreadyLiked) {
                         //Add like
                         post.likes.push(authData.id)
-                        //send notification to post author
-                        let notification = new Notification()
-                        notification.who = authData.id
-                        notification.action = 'likePost'
-                        notification.relevantPost = post._id
-                        notification.receiver = post.author
-                        notification.save((err) => {
-                            if (err) console.error(err)
-                        })
-                        notification.who = user
-                        let event = {
-                            type: "notification",
-                            content: notification
+                        //send notification to post author (if it's not author liking their own post)
+                        if(post.author != authData.id){
+                            let notification = new Notification()
+                            notification.who = authData.id
+                            notification.action = 'likePost'
+                            notification.relevantPost = post._id
+                            notification.receiver = post.author
+                            notification.save((err) => {
+                                if (err) console.error(err)
+                            })
+                            notification.who = user
+                            let event = {
+                                type: "notification",
+                                content: notification
+                            }
+                            io.sockets.emit(post.author, event)
                         }
-                        io.sockets.emit(post.author, event)
+                        
                     } else {
                         //Unlike
                         post.likes = post.likes.filter(e => e != authData.id);
