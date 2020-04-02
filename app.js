@@ -8,7 +8,7 @@ const io = require('socket.io')(http);
 const port = config.port;
 app.use(express.json());
 app.use(cors());
-
+app.use('/uploads', express.static('uploads'))
 // doc
 const swaggerUi = require('swagger-ui-express')
 const YAML = require('yamljs');
