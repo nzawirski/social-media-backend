@@ -65,3 +65,6 @@ yarn.lock
 
 #uploads
 uploads/
+
+# jetbois
+.idea

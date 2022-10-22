@@ -17,7 +17,9 @@ function sendEmail(emailPayload) {
             }
         });
     }else{
-        console.log(emailPayload)
+        if(process.env.NODE_ENV !== 'test'){
+            console.log(emailPayload)
+        }
     }
 
 }
