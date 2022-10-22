@@ -1,5 +1,7 @@
 ### Backend for a social media site. Roughly based on an app i created for my B.Eng project. 
 
+Swagger doc live here: https://nz-social-media-api.herokuapp.com/api-doc/
+
 #### App has all most functionalities expected from a social media website
 * Users can create accounts and update information on their profiles
 * Users can follow other users, search and browse each others profiles
